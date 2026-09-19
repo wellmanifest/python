@@ -1,0 +1,17 @@
+[project]
+name = "wellmanifest-python"
+version = "0.1.0"
+description = "Wellmanifest standard for Python environment architecture, distribution lifecycle, and multi-credential resilience"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Tom Sapletta", email = "info@softreck.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
