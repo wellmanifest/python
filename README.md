@@ -131,3 +131,13 @@ When background daemons (such as PR validators, continuous auto-loops, or sync r
 | `API rate limit exceeded for user ID` | Account hourly limit exhausted | Switch account: `gh auth switch` or wait for reset |
 | `403 Forbidden` on ticket sync | Concurrency burst or token missing scope | Verify `gh auth status` and inspect `Retry-After` |
 | Uncommitted changes vanished | Background script ran `git stash` | Check `git stash list` and restore via `git stash pop` |
+| `build_content_differs` / drift warning | `dist/` wheel differs from active source tree | Rebuild wheel with `python -m build --wheel` (PYTHON-DIST-001) |
+
+---
+
+## 7. Normative Rules Index
+
+* **`PYTHON-DIST-001` (Commit-Artifact Parity):** Every wheel/sdist in `dist/` must match the source tree byte-for-byte; version number equivalence alone does not constitute build parity.
+* **`PYTHON-DIST-002` (Three-Fact Introspection):** CLI `--version` commands must report source version/commit, installed environment metadata, and newest built artifact in `dist/`.
+* **`PYTHON-DIST-003` (Byte-for-Byte Build Verification):** Application runtime must verify module content parity against the built wheel at startup or test gates and fail closed on drift.
+

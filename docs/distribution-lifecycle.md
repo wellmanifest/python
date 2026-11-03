@@ -65,3 +65,29 @@ goal -a -u -r
    password = pypi-AgEI...
    ```
 3. **Vault Integration:** `@subactor/credential-vault` lease client when running under autonomous supervisor agents.
+
+---
+
+## 4. Distribution Integrity and Parity Rules
+
+To eliminate silent drift between developer source trees, installed environments, and distribution packages:
+
+### PYTHON-DIST-001: Commit-Artifact Parity
+* **Invariant:** Every artifact in `dist/` (wheel and sdist) must originate from and correspond byte-for-byte to the exact commit SHA or clean checkout it represents.
+* **Prohibition:** Merely matching the SemVer version string in `pyproject.toml` is insufficient to establish build identity. Releasing or retaining an artifact built from an earlier commit or differing code under the same version tag is strictly prohibited.
+* **Remediation:** If the source tree changes after a build, the existing artifact must either be rebuilt from the updated tree or retired before release.
+
+### PYTHON-DIST-002: Three-Fact Version Introspection
+Every Python package providing a CLI entry point must support `--version` reporting three distinct, verifiable runtime facts:
+1. **Source Version & Head:** Source version from `VERSION` / `pyproject.toml` and git commit SHA.
+2. **Installed Environment Metadata:** Installed package version from environment metadata (e.g. `importlib.metadata`), recording whether the package is running from an editable install (`-e`) or standard site-packages.
+3. **Distribution Artifact Parity:** The newest artifact in `dist/` (`built: <name>.whl`), reporting file modification time, size, and whether the packaged code matches the source byte-for-byte.
+
+### PYTHON-DIST-003: Startup Version Probe & Byte Verification
+* **Automated Probe:** Python applications must provide an automated version probe (`version_probe.probe()`) comparing every packaged Python module (`**/*.py`) in the newest wheel with the corresponding source file byte-for-byte.
+* **Failure Modes:**
+  - `build_content_differs`: Packaged module contents differ from the source file.
+  - `build_file_missing`: A source module is missing from the packaged wheel.
+  - `version_mismatch`: Installed or built version differs from source `VERSION`.
+* **Behavior:** When drift is detected, CLI applications must emit an explicit diagnostic warning on startup and CI/CD verification gates must fail closed.
+
